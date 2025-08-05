@@ -1,2 +1,2 @@
 # README
-1. JENKINS 테스트 중입니다
+1. JENKINS 자동빌드 테스트
