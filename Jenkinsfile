@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 pipeline {
   agent any
 
@@ -10,6 +12,7 @@ pipeline {
     SSH_KEY_ID = "jenkins-todo-backend-key"
     PROJECT_DIR = "/home/ubuntu/apps"
     BACKEND_DIR = "$PROJECT_DIR/todo-backend"
+    SLACK_WEBHOOK = credentials('SLACK_WEBHOOK') // 동일한 Webhook 사용
   }
 
   stages {
@@ -50,6 +53,40 @@ pipeline {
             '
           """
         }
+      }
+    }
+  }
+
+  post {
+    success {
+      script {
+        def payload = [
+          username: "Jenkins Todo Notifier",
+          text: "✅ todo-backend 배포 성공!!\n코드가 성공적으로 배포되었습니다 🚀"
+        ]
+
+        httpRequest(
+          httpMode: 'POST',
+          contentType: 'APPLICATION_JSON',
+          requestBody: JsonOutput.toJson(payload),
+          url: SLACK_WEBHOOK
+        )
+      }
+    }
+
+    failure {
+      script {
+        def payload = [
+          username: "Jenkins Todo Notifier",
+          text: "❌ todo-backend 배포 실패!\n배포 중 문제가 발생했습니다. 콘솔 로그를 확인하세요."
+        ]
+
+        httpRequest(
+          httpMode: 'POST',
+          contentType: 'APPLICATION_JSON',
+          requestBody: JsonOutput.toJson(payload),
+          url: SLACK_WEBHOOK
+        )
       }
     }
   }
