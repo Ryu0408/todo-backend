@@ -13,6 +13,20 @@ pipeline {
   }
 
   stages {
+    stage('Test todo-backend') {
+      steps {
+        sshagent(credentials: [SSH_KEY_ID]) {
+          sh """
+            ssh -o StrictHostKeyChecking=no $SSH_TARGET '
+              cd $BACKEND_DIR &&
+              echo "[🔍] 백엔드 테스트 시작" &&
+              ./gradlew test || exit 1
+            '
+          """
+        }
+      }
+    }
+
     stage('Deploy todo-backend only') {
       steps {
         sshagent(credentials: [SSH_KEY_ID]) {
