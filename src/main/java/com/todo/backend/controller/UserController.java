@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")  // /api는 Nginx에서 처리하니까 Spring은 그냥 /users로
+@RequestMapping("/api/users")  // 변경된 경로
 @RequiredArgsConstructor
 public class UserController {
 
