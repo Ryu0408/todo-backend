@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users")  // 'user'는 예약어일 수 있어 'users'로 맞추는 게 안전
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,12 +16,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @Column(nullable = false, unique = true)
+    private String email;
+
     private String username;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String role;  // ex: "USER", "ADMIN"
+    private String role;
+
+    @Column(name = "created_at")
+    private String createdAt; // 또는 LocalDateTime
 }
+
