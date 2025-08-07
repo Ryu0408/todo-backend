@@ -48,17 +48,17 @@ public class S3Service {
         // S3에 업로드할 객체 생성
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(file.getOriginalFilename())
+                .key(file.getOriginalFilename()) // 객체 키 설정
                 .contentType(file.getContentType())
                 .build();
 
         // S3에 파일 업로드
         s3Client.putObject(putObjectRequest, tempFilePath);
 
-        // 업로드 완료 후 임시 파일 삭제
+        // 임시 파일 삭제
         Files.delete(tempFilePath);
 
-        // S3에 업로드된 파일 URL 반환 (여기선 URL 생성 방법은 예시로 설정)
-        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + file.getOriginalFilename();
+        // S3에 업로드된 파일 URL 반환
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, file.getOriginalFilename());
     }
 }
