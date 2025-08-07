@@ -42,11 +42,11 @@ pipeline {
               echo "[2] 📦 docker-compose 실행 디렉토리 이동"
               cd $PROJECT_DIR
 
-              echo "[3] 🛠️ docker-compose build backend"
-              docker-compose build backend
+              echo "[3] 🛠️ docker-compose down (기존 컨테이너 종료)"
+              docker-compose down  # 기존 컨테이너 중지 및 삭제
 
-              echo "[4] ♻️ docker-compose restart backend"
-              docker-compose restart backend
+              echo "[4] 🏗️ docker-compose up -d --build (새로 빌드하여 실행)"
+              docker-compose up -d --build  # 새 이미지를 빌드하고 컨테이너 실행
             '
           """
         }
