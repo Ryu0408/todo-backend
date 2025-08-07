@@ -11,12 +11,15 @@ import java.io.IOException;
 @RequestMapping("/api/upload")
 public class FileUploadController {
 
+    private final S3Service s3Service;
+
     @Autowired
-    private S3Service s3Service;
+    public FileUploadController(S3Service s3Service) {
+        this.s3Service = s3Service;
+    }
 
     @PostMapping
     public String uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        // S3에 파일 업로드 후 URL 반환1
         return s3Service.uploadFile(file);
     }
 }
