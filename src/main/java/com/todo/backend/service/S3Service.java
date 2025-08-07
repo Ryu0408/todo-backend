@@ -1,6 +1,6 @@
 package com.todo.backend.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.todo.backend.config.AwsS3Properties;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -8,7 +8,6 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,25 +17,18 @@ import java.nio.file.Paths;
 @Service
 public class S3Service {
 
-    @Value("${aws.s3.accessKeyId}")
-    private String accessKeyId;
-
-    @Value("${aws.s3.secretAccessKey}")
-    private String secretAccessKey;
-
-    @Value("${aws.s3.region}")
-    private String region;
-
-    @Value("${aws.s3.bucketName}")
-    private String bucketName;
-
+    private final AwsS3Properties awsS3Properties;
     private final S3Client s3Client;
 
-    public S3Service() {
+    public S3Service(AwsS3Properties awsS3Properties) {
+        this.awsS3Properties = awsS3Properties;
+
         // AWS SDK 클라이언트 설정
-        s3Client = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
+        this.s3Client = S3Client.builder()
+                .region(Region.of(awsS3Properties.getRegion()))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
+                        awsS3Properties.getAccessKeyId(),
+                        awsS3Properties.getSecretAccessKey())))
                 .build();
     }
 
@@ -47,7 +39,7 @@ public class S3Service {
 
         // S3에 업로드할 객체 생성
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(awsS3Properties.getBucketName())
                 .key(file.getOriginalFilename()) // 객체 키 설정
                 .contentType(file.getContentType())
                 .build();
@@ -59,6 +51,6 @@ public class S3Service {
         Files.delete(tempFilePath);
 
         // S3에 업로드된 파일 URL 반환
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, file.getOriginalFilename());
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", awsS3Properties.getBucketName(), awsS3Properties.getRegion(), file.getOriginalFilename());
     }
 }
