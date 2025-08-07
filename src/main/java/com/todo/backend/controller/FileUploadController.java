@@ -16,7 +16,7 @@ public class FileUploadController {
 
     @PostMapping
     public String uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        // S3에 파일 업로드 후 URL 반환
+        // S3에 파일 업로드 후 URL 반환1
         return s3Service.uploadFile(file);
     }
 }
