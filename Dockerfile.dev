@@ -1,0 +1,7 @@
+FROM gradle:8.5-jdk17
+
+WORKDIR /app
+COPY . .
+
+# Gradle을 실행할 때, 명령어가 올바르게 실행되도록 쉘 형식으로 작성
+CMD ["gradle", "bootRun"]  # 개발 모드에서 실행
