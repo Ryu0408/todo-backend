@@ -43,6 +43,11 @@ dependencies {
 
     // dotenv-java for .env management
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
+    // AWS SDK for S3 (S3 파일 업로드 기능)
+    implementation 'software.amazon.awssdk:s3:2.17.56' // AWS SDK for S3 2.x 버전
+    implementation 'software.amazon.awssdk:auth:2.17.56' // 인증 관련 의존성 (자격 증명)
+    implementation 'software.amazon.awssdk:regions:2.17.56' // 리전 관련 의존성
 }
 
 tasks.named('test') {
