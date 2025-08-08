@@ -1,33 +1,47 @@
 package com.todo.backend.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.CacheErrorHandler;
+import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.cache.interceptor.CacheErrorHandler;
-import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.serializer.*;
+import java.time.Duration;
 
 @Configuration
 @EnableCaching
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-        return template;
+    public org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory cf) {
+        var t = new org.springframework.data.redis.core.RedisTemplate<String, Object>();
+        t.setConnectionFactory(cf);
+        t.setKeySerializer(new StringRedisSerializer());
+        t.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        t.setHashKeySerializer(new StringRedisSerializer());
+        t.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return t;
     }
 
-    // 🔧 Redis 장애 시 500 안 나게(예외 삼키고 경고 로그만)
+    // 캐시 매니저(JSON 직렬화 + TTL)
+    @Bean
+    public RedisCacheManager cacheManager(RedisConnectionFactory cf) {
+        RedisCacheConfiguration cfg = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10)) // yml의 spring.cache.redis.time-to-live와 동일하게
+                .disableCachingNullValues()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        return RedisCacheManager.builder(cf)
+                .cacheDefaults(cfg)
+                .build();
+    }
+
     @Bean
     public CacheErrorHandler cacheErrorHandler() {
         Logger log = LoggerFactory.getLogger("CacheErrorHandler");
