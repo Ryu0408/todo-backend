@@ -31,10 +31,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'  // Lombok annotationProcessor
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // JPA (Jakarta Persistence)
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-
+    
     // Spring Boot Starter JPA (Hibernate is included by default)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
@@ -48,6 +45,10 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.17.56' // AWS SDK for S3 2.x 버전
     implementation 'software.amazon.awssdk:auth:2.17.56' // 인증 관련 의존성 (자격 증명)
     implementation 'software.amazon.awssdk:regions:2.17.56' // 리전 관련 의존성
+
+    // Spring Boot Starter Redis for caching
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
 
 tasks.named('test') {

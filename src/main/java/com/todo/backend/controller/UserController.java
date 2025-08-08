@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/api/users")  // 변경된 경로
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -20,8 +22,15 @@ public class UserController {
 
     @GetMapping("/{username}")
     public ResponseEntity<User> getUser(@PathVariable String username) {
-        return userService.findByUsername(username)
+        User u = userService.getByUsername(username);   // 캐시 타는 메서드로 변경
+        return Optional.ofNullable(u)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{username}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
+        userService.deleteByUsername(username);
+        return ResponseEntity.noContent().build();
     }
 }
