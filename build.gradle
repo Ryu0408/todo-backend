@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.4'
+    id 'org.springframework.boot' version '3.3.2'          // ✅ 안정판 권장
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     compileOnly 'org.projectlombok:lombok'  // Lombok 의존성 추가
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
