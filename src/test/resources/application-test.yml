@@ -1,3 +1,4 @@
 spring:
+  application.name: file-service-test
   kafka:
     bootstrap-servers: 127.0.0.1:0   # 붙지 않게 dummy

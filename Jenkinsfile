@@ -22,8 +22,8 @@ pipeline {
           sh """
             ssh -o StrictHostKeyChecking=no $SSH_TARGET '
               cd $BACKEND_DIR &&
-              echo "[🔍] 백엔드 테스트 시작" &&
-              ./gradlew test || exit 1
+              echo "[🔍] 백엔드 테스트 시작 (spring.profiles.active=test)" &&
+              ./gradlew clean test -Dspring.profiles.active=test
             '
           """
         }
