@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/files")   // FileQueueController
 public class FileQueueController {
 
     private final FilePublishService publishService;

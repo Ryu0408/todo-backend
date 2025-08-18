@@ -7,38 +7,50 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 
-@EnableRabbit
 @Configuration
+@EnableRabbit
 public class RabbitConfig {
 
-    // application.yml 의 app.rabbit.* 값을 주입
-    @Value("${app.rabbit.exchange:file.exchange}")
-    private String exchangeName;
-
-    @Value("${app.rabbit.queue:file.queue}")
-    private String queueName;
-
-    @Value("${app.rabbit.routing-key:file.routing}")
-    private String routingKey;
-
     @Bean
-    public DirectExchange fileExchange() {
+    public DirectExchange fileExchange(@Value("${app.rabbit.exchange:file.exchange}") String exchangeName) {
         return ExchangeBuilder.directExchange(exchangeName).durable(true).build();
     }
 
     @Bean
-    public Queue fileQueue() {
+    public Queue fileQueue(@Value("${app.rabbit.queue:file.queue}") String queueName) {
         return QueueBuilder.durable(queueName).build();
     }
 
     @Bean
-    public Binding fileBinding(DirectExchange fileExchange, Queue fileQueue) {
+    public Binding fileBinding(DirectExchange fileExchange, Queue fileQueue,
+                               @Value("${app.rabbit.routing-key:file.routing}") String routingKey) {
         return BindingBuilder.bind(fileQueue).to(fileExchange).with(routingKey);
     }
 
+    // ✅ 이름을 messageConverter로
     @Bean
-    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
-        // RabbitTemplate / @RabbitListener 가 이 컨버터를 사용해 DTO <-> JSON 변환
+    public org.springframework.amqp.support.converter.MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+
+    // ✅ RabbitTemplate에 컨버터 주입
+    @Bean
+    public org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate(
+            org.springframework.amqp.rabbit.connection.ConnectionFactory cf,
+            org.springframework.amqp.support.converter.MessageConverter mc) {
+        var rt = new org.springframework.amqp.rabbit.core.RabbitTemplate(cf);
+        rt.setMessageConverter(mc);
+        return rt;
+    }
+
+    // (선택) Listener 쪽에도 확실히 적용
+    @Bean
+    public org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            org.springframework.amqp.rabbit.connection.ConnectionFactory cf,
+            org.springframework.amqp.support.converter.MessageConverter mc) {
+        var f = new org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory();
+        f.setConnectionFactory(cf);
+        f.setMessageConverter(mc);
+        return f;
     }
 }
