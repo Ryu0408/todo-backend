@@ -5,5 +5,6 @@ public record FileMessage(
         String originalName,
         long size,
         String contentType,
-        String s3Key
+        String s3Key,
+        String localPath
 ) {}
